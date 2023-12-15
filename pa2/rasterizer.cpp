@@ -123,24 +123,24 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     bbox[0] = Eigen::Vector2f(min(min(v[0].x(), v[1].x()), v[2].x()), min(min(v[0].y(), v[1].y()), v[2].y()));
     bbox[1] = Eigen::Vector2f(max(max(v[0].x(), v[1].x()), v[2].x()), max(max(v[0].y(), v[1].y()), v[2].y()));
 
-    for(int i = bbox[0].y(); i < bbox[1].y(); ++i)
+    for(int y = bbox[0].y(); y < bbox[1].y(); ++y)
     {
-        for(int j = bbox[0].x(); j < bbox[1].x(); ++j)
+        for(int x = bbox[0].x(); x < bbox[1].x(); ++x)
         {
            
-            if(insideTriangle(j, i, t.v))
+            if(insideTriangle(x, y, t.v))
             {
-                auto[alpha, beta, gamma] = computeBarycentric2D(j, i, t.v);
+                auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
                 float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
                 float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
                 z_interpolated *= w_reciprocal;
 
-                auto ind = (height-1-j)*width + i;
+                auto ind = (height-1-y)*width + x;
                 auto z_old = depth_buf[ind];
                 if(z_interpolated < z_old)
                 {
                     depth_buf[ind] = z_interpolated;
-                    set_pixel(Eigen::Vector3f(j, i, z_interpolated), t.getColor());
+                    set_pixel(Eigen::Vector3f(x, y, z_interpolated), t.getColor());
                 }
 
             }
